@@ -1,5 +1,6 @@
+import { CreateSaleDto } from '../../application/dto/create-sale.dto';
 export interface ISaleRepository{
-    createSale()
+    createSale(createSaleDto:CreateSaleDto):Promise<string>
     findAll()
-    findOneById()
+    findOneById(saleId)
 }

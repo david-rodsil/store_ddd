@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Sale } from './infraestructure/entities/sale.entity';
 import { Product } from 'src/products/infraestructure/entities/product.entity';
 import { Sales_Products } from './infraestructure/entities/sale_product.entity';
+import { ProductsModule } from 'src/products/products.module';
 
 @Module({
   controllers: [SalesController],
@@ -16,6 +17,7 @@ import { Sales_Products } from './infraestructure/entities/sale_product.entity';
       Product,
       Sales_Products
     ]),
+    ProductsModule
   ]
 })
 export class SalesModule {}
