@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IProduct } from 'src/products/domain/ientities/iproduct.entity';
+import { Sales_Products } from 'src/sales/infraestructure/entities/sale_product.entity';
 import {
   BeforeInsert,
   Check,
@@ -7,6 +8,7 @@ import {
   Column,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   TableInheritance,
 } from 'typeorm';
@@ -83,5 +85,10 @@ export class Product implements IProduct{
         unique:true
     })
     productSlug: string
+
+    items: number
+
+    @OneToMany(()=>Sales_Products, sales_products=>sales_products.products)
+    sale_products: Sales_Products[]
 }
 
