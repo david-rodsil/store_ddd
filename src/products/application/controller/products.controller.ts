@@ -29,7 +29,12 @@ export class ProductController {
   }
   
   @Patch(':id')
-  update(@Param('id',ParseUUIDPipe)productId: string, @Body() updateProductDto:UpdateProductDto){
+  update(@Param('id',ParseUUIDPipe) productId: string, @Body() updateProductDto:UpdateProductDto){
     return this.productService.update(productId,updateProductDto)
+  }
+
+  @Delete(':id')
+  remove(@Param('id',ParseUUIDPipe) productId: string){
+    return this.productService.remove(productId)
   }
 }

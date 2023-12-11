@@ -41,4 +41,9 @@ export class ProductService {
     return this.res.response('OK', 'Product was update.', product, new Date());
   }
 
+  async remove(productId:String){
+    const message=await this.productRepository.removeProduct(productId)
+    return this.res.response('OK','Product was delete',message, new Date())
+  }
+
 }

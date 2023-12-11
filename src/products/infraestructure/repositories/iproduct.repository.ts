@@ -95,4 +95,21 @@ export class ProductRepository extends Repository<Product> implements IProductRe
       throw new BadRequestException()
     }
   }
+
+  async removeProduct(productId: string): Promise<String> {
+       //Buscar producto
+    const product = await this.findOne(productId)
+
+    if (!product) {
+
+      //Si el producto no se encontró
+      throw new NotFoundException(`Product with id ${productId} not found`)
+
+    }else{
+
+      //Se realiza la operacion delete en la base de datos
+      await this.remove(product)
+      return `The product was delete`
+    }
+  }
 }

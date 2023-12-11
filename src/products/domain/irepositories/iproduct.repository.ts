@@ -8,4 +8,5 @@ export interface IProductRepository {
   findAll(findProductDto:FindProductDto):Promise<IProduct[]>;
   findOneById(term:String):Promise<IProduct[]>;
   updateProduct(productId:String,updateProductDto:UpdateProductDto):Promise<IProduct>
+  removeProduct(productId:String):Promise<String>
 }
