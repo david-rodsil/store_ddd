@@ -8,17 +8,26 @@ import { CreateProductDto } from 'src/products/application/dto/create-product.dt
 import { IProductRepository } from '../irepositories/iproduct.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductRepository } from 'src/products/infraestructure/repositories/iproduct.repository';
+import { FindProductDto } from '../../application/dto/find-product.dto';
 
 @Injectable()
 export class ProductService {
+
   private readonly res = new CustomResponse();
+  
   constructor(
     @InjectRepository(ProductRepository)
     public readonly productRepository: IProductRepository,
   ) {}
+  
   async create(createProductDto: CreateProductDto): Promise<CustomResponseInterface> {
     const productN = await this.productRepository.createProduct(createProductDto);
     return this.res.response('OK', 'Product was created.', productN, new Date());
+  }
+
+  async findAll(findProductDto:FindProductDto){
+    const products = await this.productRepository.findAll(findProductDto);
+    return this.res.response('OK', 'Products was found.', products, new Date());
   }
 
 }

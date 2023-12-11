@@ -18,7 +18,6 @@ import { ProductsModule } from './products/products.module';
       autoLoadEntities: true,
       //Solo usar en desarrollo
       synchronize: true,
-      logging: true,
       entities: [
         __dirname + '/../../**/infrastructure/entities/*.entity.{js,ts}',
       ],

@@ -83,19 +83,5 @@ export class Product implements IProduct{
         unique:true
     })
     productSlug: string
-
-    //En caso de que el slug sea nulo, se genera un slug basado en el nombre
-    @BeforeInsert()
-    checkSlugInsert(){
-      if (!this.productSlug) {
-        this.productSlug = this.productCode
-            .toLowerCase()
-            .trim()
-            .replace(" ","_")
-            .replace("'","")
-            .concat('_details')
-      }
-    }
-
 }
 
