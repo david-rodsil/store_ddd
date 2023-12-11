@@ -1,16 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsString,
-  MinLength,
-  MaxLength,
-  IsArray,
-  IsInt,
-  IsPositive,
-  IsNumber,
-  Min,
-  IsOptional,
-  IsIn,
-} from 'class-validator';
+import {IsString,MinLength,IsInt,IsPositive,IsNumber,IsOptional,IsIn,} from 'class-validator';
 
 export class CreateProductDto {
   @ApiProperty({description:'Product code (unique)',nullable:false, minLength:1})

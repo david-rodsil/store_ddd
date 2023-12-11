@@ -9,6 +9,7 @@ import { IProductRepository } from '../irepositories/iproduct.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductRepository } from 'src/products/infraestructure/repositories/iproduct.repository';
 import { FindProductDto } from '../../application/dto/find-product.dto';
+import { UpdateProductDto } from 'src/products/application/dto/update-product.dto';
 
 @Injectable()
 export class ProductService {
@@ -28,6 +29,16 @@ export class ProductService {
   async findAll(findProductDto:FindProductDto){
     const products = await this.productRepository.findAll(findProductDto);
     return this.res.response('OK', 'Products was found.', products, new Date());
+  }
+
+  async findOneById(term:String){
+    const product = await this.productRepository.findOneById(term);
+    return this.res.response('OK', 'Product was found.', product, new Date());
+  }
+
+  async update(productId:String,updateProductDto:UpdateProductDto){
+    const product=await this.productRepository.updateProduct(productId,updateProductDto);
+    return this.res.response('OK', 'Product was update.', product, new Date());
   }
 
 }

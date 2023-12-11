@@ -1,9 +1,10 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe, UsePipes, Query} from '@nestjs/common';
+import {Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe, UsePipes, Query, ParseUUIDPipe} from '@nestjs/common';
 import { ProductService } from '../../domain/services/products.service';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Product } from 'src/products/infraestructure/entities/product.entity';
 import { FindProductDto } from '../dto/find-product.dto';
+import { UpdateProductDto } from '../dto/update-product.dto';
 
 @ApiTags('Products')
 @Controller('product')
@@ -21,6 +22,14 @@ export class ProductController {
   findAll(@Query() findProductDto:FindProductDto) {
     return this.productService.findAll(findProductDto);
   }
-  
 
+  @Get(':id')
+  findOne(@Param('id') term: string){
+    return this.productService.findOneById(term)
+  }
+  
+  @Patch(':id')
+  update(@Param('id',ParseUUIDPipe)productId: string, @Body() updateProductDto:UpdateProductDto){
+    return this.productService.update(productId,updateProductDto)
+  }
 }
