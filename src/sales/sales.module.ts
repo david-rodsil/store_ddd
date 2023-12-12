@@ -6,6 +6,7 @@ import { Sale } from './infraestructure/entities/sale.entity';
 import { Product } from 'src/products/infraestructure/entities/product.entity';
 import { Sales_Products } from './infraestructure/entities/sale_product.entity';
 import { ProductsModule } from 'src/products/products.module';
+import { SaleRepository } from './infraestructure/repositories/isale.repository';
 
 @Module({
   controllers: [SalesController],
@@ -15,7 +16,8 @@ import { ProductsModule } from 'src/products/products.module';
     TypeOrmModule.forFeature([
       Sale,
       Product,
-      Sales_Products
+      Sales_Products,
+      SaleRepository,   
     ]),
     ProductsModule
   ]

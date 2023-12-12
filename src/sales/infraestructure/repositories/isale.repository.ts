@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { EntityRepository, Repository } from "typeorm";
 import { Sale } from "../entities/sale.entity";
 import { ISaleRepository } from "src/sales/domain/irepositories/isale.repository";
 import { CreateSaleDto } from "src/sales/application/dto/create-sale.dto";
@@ -6,8 +6,16 @@ import { Product } from "src/products/infraestructure/entities/product.entity";
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { Sales_Products } from "../entities/sale_product.entity";
 import { ProductRepository } from "src/products/infraestructure/repositories/iproduct.repository";
+import { InjectRepository } from "@nestjs/typeorm";
 
+@EntityRepository(Sale)
 export class SaleRepository extends Repository<Sale> implements ISaleRepository{
+  constructor(
+    @InjectRepository(Product)
+    private readonly productRepository:Repository<Product>,
+  ){
+    super()
+  }
     async createSale(createSaleDto: CreateSaleDto): Promise<string> {
         const sale = new Sale();
      const products: Product[] = createSaleDto.products;
@@ -24,7 +32,7 @@ export class SaleRepository extends Repository<Sale> implements ISaleRepository{
        for (let index = 0; index < products.length; index++) {
  
          //Obtenemos el producto
-         let product = await ({productCode:products[index].productCode})
+         let product = await this.productRepository.findOne({productCode:products[index].productCode})
 
          //Si no se encuentra el producto se manda un mensaje de error
          if (!product) {
