@@ -27,7 +27,7 @@ export class SalesService {
     public readonly saleProductRepository:Repository<Sales_Products>
   ) {}
 
-  async create(createSaleDto: CreateSaleDto): Promise<CustomResponseInterface> {
+  async create(createSaleDto: CreateSaleDto): Promise<string> {
     const products: Product[] = createSaleDto.products;
     const sale = new Sale();
     let totalSale: number = 0;
@@ -79,7 +79,7 @@ export class SalesService {
       //Se ejecuta la transacción
       await queryRunner.commitTransaction();
       await queryRunner.release();
-      return this.res.response('OK', 'Sale was created.', 'Success', new Date())
+      return 'success'
     } catch (error) {
       await queryRunner.rollbackTransaction();
       await queryRunner.release();
@@ -111,7 +111,7 @@ export class SalesService {
         sale_products.push(saleProduct)
       }
       const saleN = await this.salesRepository.findOneById(sale_products,sale)
-      return this.res.response('OK', 'Sale found.', saleN, new Date())
+      return saleN
   }
 
   update(id: number, updateSaleDto: UpdateSaleDto) {
