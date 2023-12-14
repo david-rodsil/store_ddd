@@ -40,7 +40,28 @@ export class SaleRepository extends Repository<Sale> implements ISaleRepository{
       return salesDetails;
     }
 
-    findOneById(saleId: any) {
-        
+    findOneById(sale_products:any,sale:Sale) {
+        //console.log(sale_products);
+      const saleDetail={
+        saleId:sale.saleId,
+        saleTotal:parseFloat(String(sale.saleTotal)).toFixed(2),
+        saleItems:parseInt(String(sale.saleItems)),
+        saleTime:sale.saleTime
+      }
+      const saleProductsDetails:any[]=[]
+      sale_products.forEach((product)=>{
+        const products = {
+          totalItems:parseInt(String(product.totalProducts)),
+          name:product.products.productName,
+          description:product.products.productDescription,
+          code:product.products.productCode,
+          price:parseFloat(String(product.products.productPrice)).toFixed(2),
+          salePrice:parseFloat(String(product.products.productPrice)).toFixed(2),
+          discount:parseInt(String(product.products.productDiscount))
+        }
+        saleProductsDetails.push(products)
+      })
+      const saleDetails={saleDetail,saleProductsDetails}
+      return saleDetails
     }
 }

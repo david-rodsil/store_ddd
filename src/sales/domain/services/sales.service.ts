@@ -9,6 +9,7 @@ import { ProductRepository } from 'src/products/infraestructure/repositories/pro
 import { Product } from 'src/products/infraestructure/entities/product.entity';
 import { Sale } from 'src/sales/infraestructure/entities/sale.entity';
 import { Sales_Products } from 'src/sales/infraestructure/entities/sale_product.entity';
+import { Code, Repository } from 'typeorm';
 
 @Injectable()
 export class SalesService {
@@ -16,10 +17,14 @@ export class SalesService {
   private readonly res = new CustomResponse();
 
   constructor(
+    @InjectRepository(Sale)
+    public readonly saleRepository:Repository<Sale>,
     @InjectRepository(SaleRepository)
-    public readonly saleRepository: SaleRepository,
+    public readonly salesRepository: ISaleRepository,
     @InjectRepository(ProductRepository)
-    public readonly productRepository:ProductRepository
+    public readonly productRepository:ProductRepository,
+    @InjectRepository(Sales_Products)
+    public readonly saleProductRepository:Repository<Sales_Products>
   ) {}
 
   async create(createSaleDto: CreateSaleDto): Promise<CustomResponseInterface> {
@@ -59,7 +64,7 @@ export class SalesService {
       //Se crea una venta
       sale.saleTotal = Number(totalSale.toFixed(2));
       sale.saleItems = totalProducts;
-      const saleProduct = await this.saleRepository.createSale(sale);
+      const saleProduct = await this.salesRepository.createSale(sale);
 
       //Se registra la venta en la tabla pivote
       listProducts.forEach(async (product, index) => {
@@ -83,14 +88,30 @@ export class SalesService {
   }
 
   async findAll() {
-    const sales= await this.saleRepository.findAll()
-    return this.res.response('OK', 'Sale found.', sales, new Date())
+    const sales= await this.salesRepository.findAll()
+    return this.res.response('OK', 'Sales found.', sales, new Date())
   }
 
   async findOne(saleId: string) {
-      const sale = await this.saleRepository.findOne(saleId,{relations:['sale_products']})
-      console.log(sale);
-    return 
+      const sale:Sale = await this.saleRepository.findOne(saleId,{relations:['sale_products']})
+      //console.log(sale);
+      const saleProducts:Sales_Products[]=sale.sale_products
+      //console.log(saleProducts);
+      const saleProductsIds:any[]=[]
+      saleProducts.forEach((saleProduct)=>{
+        const saleProductId={
+          sale_productId:saleProduct.sale_productsId
+        }
+        saleProductsIds.push(saleProductId)
+      })
+      //console.log(saleProductsIds);
+      let sale_products:Sales_Products[]=[]
+      for (let index = 0; index < saleProductsIds.length; index++) {
+        const saleProduct= await this.saleProductRepository.findOne(saleProductsIds[index].sale_productId,{relations:['products']})
+        sale_products.push(saleProduct)
+      }
+      const saleN = await this.salesRepository.findOneById(sale_products,sale)
+      return this.res.response('OK', 'Sale found.', saleN, new Date())
   }
 
   update(id: number, updateSaleDto: UpdateSaleDto) {
