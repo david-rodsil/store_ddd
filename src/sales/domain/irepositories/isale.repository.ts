@@ -1,6 +1,7 @@
+import { Sale } from 'src/sales/infraestructure/entities/sale.entity';
 import { CreateSaleDto } from '../../application/dto/create-sale.dto';
 export interface ISaleRepository{
-    createSale(createSaleDto:CreateSaleDto):Promise<string>
+    createSale(sale:Sale):Promise<Sale>
     findAll()
     findOneById(saleId)
 }

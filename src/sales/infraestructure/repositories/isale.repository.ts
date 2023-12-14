@@ -8,18 +8,18 @@ import { InjectRepository } from "@nestjs/typeorm";
 
 @EntityRepository(Sale)
 export class SaleRepository extends Repository<Sale> implements ISaleRepository{
-  constructor(
-    @InjectRepository(Product)
-    private readonly productRepository:Repository<Product>,
-  ){
-    super()
-  }
-    async createSale(createSaleDto: CreateSaleDto): Promise<string> {
+    async createSale(sale: Sale): Promise<Sale> {
+        const queryRunner = this.manager.connection.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
         try {
-          const product = await this.productRepository.findOne({productCode:createSaleDto.products[0].productCode})
-          const name=(product).productName
-          return name
+          const saleProduct = await queryRunner.manager.save(Sale, sale);
+          await queryRunner.commitTransaction();
+          await queryRunner.release();
+          return saleProduct
         } catch (error) {
+          await queryRunner.rollbackTransaction();
+          await queryRunner.release();
           throw new BadRequestException()
         }
     }
