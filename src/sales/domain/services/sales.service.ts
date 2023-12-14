@@ -3,9 +3,9 @@ import { CreateSaleDto } from '../../application/dto/create-sale.dto';
 import { UpdateSaleDto } from '../../application/dto/update-sale.dto';
 import { CustomResponse, CustomResponseInterface } from 'src/common/customResponse/response';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SaleRepository } from 'src/sales/infraestructure/repositories/isale.repository';
+import { SaleRepository } from 'src/sales/infraestructure/repositories/sale.repository';
 import { ISaleRepository } from '../irepositories/isale.repository';
-import { ProductRepository } from 'src/products/infraestructure/repositories/iproduct.repository';
+import { ProductRepository } from 'src/products/infraestructure/repositories/product.repository';
 import { Product } from 'src/products/infraestructure/entities/product.entity';
 import { Sale } from 'src/sales/infraestructure/entities/sale.entity';
 import { Sales_Products } from 'src/sales/infraestructure/entities/sale_product.entity';
@@ -15,10 +15,9 @@ export class SalesService {
   
   private readonly res = new CustomResponse();
 
-
   constructor(
     @InjectRepository(SaleRepository)
-    public readonly saleRepository: ISaleRepository,
+    public readonly saleRepository: SaleRepository,
     @InjectRepository(ProductRepository)
     public readonly productRepository:ProductRepository
   ) {}
@@ -83,12 +82,15 @@ export class SalesService {
     }
   }
 
-  findAll() {
-    return `This action returns all sales`;
+  async findAll() {
+    const sales= await this.saleRepository.findAll()
+    return this.res.response('OK', 'Sale found.', sales, new Date())
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} sale`;
+  async findOne(saleId: string) {
+      const sale = await this.saleRepository.findOne(saleId,{relations:['sale_products']})
+      console.log(sale);
+    return 
   }
 
   update(id: number, updateSaleDto: UpdateSaleDto) {

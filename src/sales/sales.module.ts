@@ -6,7 +6,7 @@ import { Sale } from './infraestructure/entities/sale.entity';
 import { Product } from 'src/products/infraestructure/entities/product.entity';
 import { Sales_Products } from './infraestructure/entities/sale_product.entity';
 import { ProductsModule } from 'src/products/products.module';
-import { SaleRepository } from './infraestructure/repositories/isale.repository';
+import { SaleRepository } from './infraestructure/repositories/sale.repository';
 
 @Module({
   controllers: [SalesController],

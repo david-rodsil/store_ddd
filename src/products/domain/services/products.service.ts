@@ -7,7 +7,7 @@ import {
 import { CreateProductDto } from 'src/products/application/dto/create-product.dto';
 import { IProductRepository } from '../irepositories/iproduct.repository';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ProductRepository } from 'src/products/infraestructure/repositories/iproduct.repository';
+import { ProductRepository } from 'src/products/infraestructure/repositories/product.repository';
 import { FindProductDto } from '../../application/dto/find-product.dto';
 import { UpdateProductDto } from 'src/products/application/dto/update-product.dto';
 

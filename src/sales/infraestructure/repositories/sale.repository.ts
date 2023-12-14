@@ -24,8 +24,20 @@ export class SaleRepository extends Repository<Sale> implements ISaleRepository{
         }
     }
 
-    findAll() {
-        
+    async findAll() {
+      const sales=await this.find()
+      const salesDetails: any[]=[];
+      sales.forEach((sale)=>{
+        //Creamos un objeto con los valores que se devolveran en la busqueda
+        const detailSale={
+          saleId:sale.saleId,
+          dateTime:sale.saleTime,
+          totalSale:parseFloat(String(sale.saleTotal)),
+          totalItems:parseInt(String(sale.saleItems))
+        }
+        salesDetails.push(detailSale)
+      })
+      return salesDetails;
     }
 
     findOneById(saleId: any) {
