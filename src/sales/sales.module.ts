@@ -4,9 +4,11 @@ import { SalesController } from './application/controller/sales.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Sale } from './infraestructure/entities/sale.entity';
 import { Product } from 'src/products/infraestructure/entities/product.entity';
-import { Sales_Products } from './infraestructure/entities/sale_product.entity';
+import { Sale_Products } from './infraestructure/entities/sale_products.entity';
 import { ProductsModule } from 'src/products/products.module';
 import { SaleRepository } from './infraestructure/repositories/sale.repository';
+import { ProductRepository } from 'src/products/infraestructure/repositories/product.repository';
+import { Sale_ProductsRepository } from './infraestructure/repositories/sale_products.repository';
 
 @Module({
   controllers: [SalesController],
@@ -16,8 +18,10 @@ import { SaleRepository } from './infraestructure/repositories/sale.repository';
     TypeOrmModule.forFeature([
       Sale,
       Product,
-      Sales_Products,
-      SaleRepository,   
+      Sale_Products,
+      SaleRepository,
+      ProductRepository,
+      Sale_ProductsRepository   
     ]),
     ProductsModule
   ]

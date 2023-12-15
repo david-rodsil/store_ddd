@@ -1,9 +1,10 @@
 import { Product } from "src/products/infraestructure/entities/product.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Sale } from "./sale.entity";
+import { ISale_Products } from "src/sales/domain/ientities/isale_products.entity";
 
 @Entity({name:'tblSales_Products'})
-export class Sales_Products {
+export class Sale_Products implements ISale_Products{
 
     @PrimaryGeneratedColumn('uuid',{name:"sale_products_uuid_id"})
     sale_productsId ?: string;

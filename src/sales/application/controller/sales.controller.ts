@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } from '@nestjs/common';
 import { SalesService } from '../../domain/services/sales.service';
 import { CreateSaleDto } from '../dto/create-sale.dto';
-import { UpdateSaleDto } from '../dto/update-sale.dto';
-import { ApiResponse } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Sales')
 @Controller('sales')
 export class SalesController {
   constructor(private readonly salesService: SalesService) {}

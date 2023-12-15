@@ -31,8 +31,8 @@ export class ProductService {
     return this.res.response('OK', 'Products was found.', products, new Date());
   }
 
-  async findOneById(term:String): Promise<CustomResponseInterface>{
-    const product = await this.productRepository.findOneById(term);
+  async findById(term:String): Promise<CustomResponseInterface>{
+    const product = await this.productRepository.findById(term);
     return this.res.response('OK', 'Product was found.', product, new Date());
   }
 

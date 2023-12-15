@@ -1,11 +1,11 @@
-import { EntityRepository, Like, Repository, getRepository } from 'typeorm';
+import { EntityRepository, FindConditions, FindOneOptions, Like, ObjectID, QueryRunner, Repository, getRepository } from 'typeorm';
 import { Product } from '../entities/product.entity';
 import { IProductRepository } from 'src/products/domain/irepositories/iproduct.repository';
 import { IProduct } from 'src/products/domain/ientities/iproduct.entity';
 
 import { FindProductDto } from 'src/products/application/dto/find-product.dto';
 import { isUUID } from 'class-validator';
-import { BadRequestException, NotFoundException, Query } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { UpdateProductDto } from 'src/products/application/dto/update-product.dto';
 
 @EntityRepository(Product)
@@ -37,7 +37,16 @@ export class ProductRepository extends Repository<Product> implements IProductRe
       return await query.getMany();
   }
 
-  async findOneById(term:String):Promise<IProduct[]>{
+  async findOneByCode(term:string):Promise<IProduct>{
+    const product = await this.findOne({
+      where:{
+      productCode:term
+    }
+    })
+    return product;
+  }
+
+  async findById(term:String):Promise<IProduct[]>{
     let product:any;
 
     //Verificamos si es un uuid para buscar el producto por el mismo
@@ -111,5 +120,9 @@ export class ProductRepository extends Repository<Product> implements IProductRe
       await this.remove(product)
       return `The product was delete`
     }
+  }
+  async createQueryRunner():Promise<QueryRunner> {
+    const queryRunner = await this.manager.connection.createQueryRunner();
+    return queryRunner
   }
 }

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IProduct } from 'src/products/domain/ientities/iproduct.entity';
-import { Sales_Products } from 'src/sales/infraestructure/entities/sale_product.entity';
+import { Sale_Products } from 'src/sales/infraestructure/entities/sale_products.entity';
 import {
   BeforeInsert,
   Check,
@@ -88,7 +88,7 @@ export class Product implements IProduct{
 
     items: number
 
-    @OneToMany(()=>Sales_Products, sales_products=>sales_products.products)
-    sale_products: Sales_Products[]
+    @OneToMany(()=>Sale_Products, sales_products=>sales_products.products)
+    sale_products: Sale_Products[]
 }
 

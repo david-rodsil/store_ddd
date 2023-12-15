@@ -8,8 +8,12 @@ import { ISaleRepository } from '../irepositories/isale.repository';
 import { ProductRepository } from 'src/products/infraestructure/repositories/product.repository';
 import { Product } from 'src/products/infraestructure/entities/product.entity';
 import { Sale } from 'src/sales/infraestructure/entities/sale.entity';
-import { Sales_Products } from 'src/sales/infraestructure/entities/sale_product.entity';
+import { Sale_Products } from 'src/sales/infraestructure/entities/sale_products.entity';
 import { Repository } from 'typeorm';
+import { IProductRepository } from 'src/products/domain/irepositories/iproduct.repository';
+import { ISale } from '../ientities/isale.entity';
+import { ISale_Products } from '../ientities/isale_products.entity';
+import { ISale_ProductsRepository } from '../irepositories/isale_products.repository';
 
 @Injectable()
 export class SalesService {
@@ -18,27 +22,28 @@ export class SalesService {
 
   constructor(
     @InjectRepository(SaleRepository)
-    public readonly saleRepository: SaleRepository,
-    @InjectRepository(SaleRepository)
-    public readonly salesRepository: ISaleRepository,
+    public readonly saleRepository: ISaleRepository,
     @InjectRepository(ProductRepository)
-    public readonly productRepository: ProductRepository,
-    @InjectRepository(Sales_Products)
-    public readonly saleProductRepository: Repository<Sales_Products>
+    public readonly productRepository: IProductRepository,
+    @InjectRepository(Sale_Products)
+    public readonly saleProductRepository: ISale_ProductsRepository
   ) {}
 
   async create(createSaleDto: CreateSaleDto): Promise<CustomResponseInterface> {
-    const queryRunner = this.productRepository.manager.connection.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
+      const queryRunner = await this.productRepository.createQueryRunner()
+      await queryRunner.connect()
+      await queryRunner.startTransaction();
+      
+      try {
       const products = createSaleDto.products;
       const sale = new Sale();
       let totalSale: number = 0;
       let totalProducts: number = 0;
       let listProducts = [];
+  
       for (let index = 0; index < products.length; index++) {
-        const product = await this.productRepository.findOne({where:{productCode:products[index].productCode}})
+        
+        const product = await this.productRepository.findOneByCode(products[index].productCode)
         
         if (!product || product.productStock<1) {
           throw new BadRequestException(`Product nof found: ${product}`)
@@ -67,13 +72,13 @@ export class SalesService {
       
       //Se registra la venta en la tabla pivote
       listProducts.forEach(async (product, index) => {
-        const sale_product: Sales_Products = {
+        const sale_product = {
           sales: saleProduct,
           products: product,
           totalProducts: products[index].items,
         };
         
-        await queryRunner.manager.save(Sales_Products, sale_product);
+        await queryRunner.manager.save(Sale_Products, sale_product);
       });
       
       //Se ejecuta la transacción
@@ -97,8 +102,8 @@ export class SalesService {
 
   async findOne(saleId: string) {
     try {
-      const sale:Sale = await this.saleRepository.findOne(saleId,{relations:['sale_products']})
-    const saleProducts:Sales_Products[]=sale.sale_products
+    const sale = await this.saleRepository.findOneSale(saleId,'sale_products')    
+    const saleProducts=sale.sale_products
     const saleProductsIds:any[]=[]
     saleProducts.forEach((saleProduct)=>{
       const saleProductId={
@@ -106,12 +111,12 @@ export class SalesService {
       }
       saleProductsIds.push(saleProductId)
     })
-    let sale_products:Sales_Products[]=[]
+    let sale_products:Sale_Products[]=[]
     for (let index = 0; index < saleProductsIds.length; index++) {
-      const saleProduct= await this.saleProductRepository.findOne(saleProductsIds[index].sale_productId,{relations:['products']})
+      const saleProduct= await this.saleProductRepository.findOneSaleProducts(saleProductsIds[index].sale_productId,'products')
       sale_products.push(saleProduct)
     }
-    const saleN = await this.salesRepository.findById(sale_products,sale)
+    const saleN = await this.saleRepository.findById(sale_products,sale)
     return saleN
     } catch (error) {
       throw new NotFoundException('Sale not found')

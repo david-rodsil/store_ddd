@@ -1,7 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
 import { ISale } from "src/sales/domain/ientities/isale.entity";
-import { Sales_Products } from "./sale_product.entity";
+import { Sale_Products } from "./sale_products.entity";
 
 @Entity({name:'tblSales'})
 export class Sale implements ISale {
@@ -35,6 +35,6 @@ export class Sale implements ISale {
     @Column({type:'timestamp', default:()=> 'CURRENT_TIMESTAMP',name:"Sale_dateDateTime"})
     saleTime: Date;
 
-    @OneToMany(()=>Sales_Products, sales_products=>sales_products.sales,{cascade:true})
-    sale_products: Sales_Products[]
+    @OneToMany(()=>Sale_Products, sales_products=>sales_products.sales,{cascade:true})
+    sale_products: Sale_Products[]
 }
