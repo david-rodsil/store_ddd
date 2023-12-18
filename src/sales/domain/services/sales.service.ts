@@ -128,6 +128,8 @@ export class SalesService {
     try {
       const sale = await this.saleRepository.findOneSale(saleId,'sale_products')    
       const saleProducts=sale.sale_products
+      
+      //De la venta obtenemos los Ids de la tabla sale_products
       const saleProductsIds:any[]=[]
       saleProducts.forEach((saleProduct)=>{
         const saleProductId={
@@ -136,8 +138,8 @@ export class SalesService {
         saleProductsIds.push(saleProductId)
       })
 
+      //Obtenemos los detalles de los productos
       let sale_products:Sale_Products[]=[]
-      
       for (let index = 0; index < saleProductsIds.length; index++) {
         const saleProduct= await this.saleProductRepository.findOneSaleProducts(saleProductsIds[index].sale_productId,'products')
         sale_products.push(saleProduct)
