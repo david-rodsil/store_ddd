@@ -35,6 +35,13 @@ export class Sale implements ISale {
     @Column({type:'timestamp', default:()=> 'CURRENT_TIMESTAMP',name:"Sale_dateDateTime"})
     saleTime: Date;
 
+    @ApiProperty({
+        example:'10',
+        description:'Discount applied'
+    })
+    @Column('numeric',{name:'Sale_numDiscount',default:0})
+    saleDiscount:number;
+
     @OneToMany(()=>Sale_Products, sales_products=>sales_products.sales,{cascade:true})
     sale_products: Sale_Products[]
 }

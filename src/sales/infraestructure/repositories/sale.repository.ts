@@ -2,7 +2,6 @@ import { EntityRepository, Repository } from "typeorm";
 import { Sale } from "../entities/sale.entity";
 import { ISaleRepository } from "src/sales/domain/irepositories/isale.repository";
 import { InternalServerErrorException } from "@nestjs/common";
-import { ISale } from '../../domain/ientities/isale.entity';
 
 @EntityRepository(Sale)
 export class SaleRepository extends Repository<Sale> implements ISaleRepository{
@@ -33,6 +32,7 @@ export class SaleRepository extends Repository<Sale> implements ISaleRepository{
           saleTime:sale.saleTime,
           saleTotal:parseFloat(String(sale.saleTotal)),
           saleItems:parseInt(String(sale.saleItems)),
+          saleDiscount:0,
           sale_products:[]
           }
       salesDetails.push(detailSale)

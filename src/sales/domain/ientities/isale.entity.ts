@@ -3,4 +3,5 @@ export interface ISale{
     saleTotal: number;
     saleItems: number;
     saleTime:Date;
+    saleDiscount:number;
 }

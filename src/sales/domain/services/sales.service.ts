@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSaleDto } from '../../application/dto/create-sale.dto';
-import { UpdateSaleDto } from '../../application/dto/update-sale.dto';
 import { CustomResponse, CustomResponseInterface } from 'src/common/customResponse/response';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SaleRepository } from 'src/sales/infraestructure/repositories/sale.repository';
@@ -9,10 +8,7 @@ import { ProductRepository } from 'src/products/infraestructure/repositories/pro
 import { Product } from 'src/products/infraestructure/entities/product.entity';
 import { Sale } from 'src/sales/infraestructure/entities/sale.entity';
 import { Sale_Products } from 'src/sales/infraestructure/entities/sale_products.entity';
-import { Repository } from 'typeorm';
 import { IProductRepository } from 'src/products/domain/irepositories/iproduct.repository';
-import { ISale } from '../ientities/isale.entity';
-import { ISale_Products } from '../ientities/isale_products.entity';
 import { ISale_ProductsRepository } from '../irepositories/isale_products.repository';
 
 @Injectable()
