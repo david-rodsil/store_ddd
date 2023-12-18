@@ -46,6 +46,10 @@ export class SalesService {
       for (let index = 0; index < products.length; index++) {
         
         const product = await this.productRepository.findOneByCode(products[index].productCode)
+
+        if (products[index].items<=0) {
+          throw new BadRequestException('Sale could not be negative products')
+        }
         
         if (!product || product.productStock<1) {
           throw new BadRequestException(`Product not found: ${product}`)
