@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param} from '@nestjs/common';
 import { SalesService } from '../../domain/services/sales.service';
 import { CreateSaleDto } from '../dto/create-sale.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';

@@ -1,17 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IProduct } from 'src/products/domain/ientities/iproduct.entity';
 import { Sale_Products } from 'src/sales/infraestructure/entities/sale_products.entity';
-import {
-  BeforeInsert,
-  Check,
-  ChildEntity,
-  Column,
-  DeleteDateColumn,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  TableInheritance,
-} from 'typeorm';
+import {Check,Column,Entity,OneToMany,PrimaryGeneratedColumn} from 'typeorm';
 
 @Entity({name:'tblProducts'})
 @Check(`"Product_intStock" >= 0`)

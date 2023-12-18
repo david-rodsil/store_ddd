@@ -1,8 +1,7 @@
-import { EntityRepository, FindConditions, FindOneOptions, Like, ObjectID, QueryRunner, Repository, getRepository } from 'typeorm';
+import { EntityRepository, Like, QueryRunner, Repository } from 'typeorm';
 import { Product } from '../entities/product.entity';
 import { IProductRepository } from 'src/products/domain/irepositories/iproduct.repository';
 import { IProduct } from 'src/products/domain/ientities/iproduct.entity';
-
 import { FindProductDto } from 'src/products/application/dto/find-product.dto';
 import { isUUID } from 'class-validator';
 import { BadRequestException, NotFoundException } from '@nestjs/common';

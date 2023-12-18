@@ -27,6 +27,7 @@ export class SalesService {
     @InjectRepository(Sale_Products)
     public readonly saleProductRepository: ISale_ProductsRepository,
 
+    //Se inyectan los servicios de descuento
     public readonly discountCurrency:CurrencyDiscountService,
     public readonly discountPercentage:PercentageDiscountService
   ) {}
@@ -43,71 +44,78 @@ export class SalesService {
         let totalProducts: number = 0;
         let listProducts = [];
     
-      for (let index = 0; index < products.length; index++) {
+        for (let index = 0; index < products.length; index++) {
         
-        const product = await this.productRepository.findOneByCode(products[index].productCode)
+          const product = await this.productRepository.findOneByCode(products[index].productCode)
 
-        if (products[index].items<=0) {
-          throw new BadRequestException('Sale could not be negative products')
+          //Si el usuario ingresa un total de items negativos
+          if (products[index].items<=0) {
+            throw new BadRequestException('Sale could not be negative products')
+          }
+          
+          //Si no hay suficientes productos en stock
+          if (!product || product.productStock<1) {
+            throw new BadRequestException(`Product not found: ${product}`)
+          }
+
+          //Calculamos el total de la venta, los descuentos realizados son sobre producto
+          let discountProduct:number=product.productDiscount/100 * product.productPrice; 
+          totalSale = totalSale + (parseFloat(String(product.productPrice))-discountProduct) * products[index].items;         
+
+          //Si hay producto suficiente se realiza el decremento
+          if (product.productStock >= products[index].items ) {
+            await queryRunner.manager.decrement(Product,{ productId: product.productId },'productStock',products[index].items,);
+            totalProducts += products[index].items;
+            listProducts.push(product);
+          } else {
+          //Si no hay productos suficientes en stock para cubrir la peticion se lanza un error
+            throw new BadRequestException(`Product ${product.productCode} is not enough in stock`);
+          }
         }
+      
+        //Se crea una venta
+        const discount_percentage=createSaleDto.discount_percentage;
+        let discount=0;
+        let discount_currency=createSaleDto.discount_currency;
+        if (!discount_currency)discount_currency=0;
+
+        //Se calcula el descuento sobre la venta deacuerdo al descuento solicitado
+        if (!discount_percentage){
+          discount = this.discountCurrency.calculateDiscount(totalSale,discount_currency);
+        }else{
+          discount=this.discountPercentage.calculateDiscount(totalSale,discount_percentage);
+        }
+        sale.saleTotal=totalSale-discount;
+
+        //Si el total es negativo se lanza un error
+        if (sale.saleTotal<0) {
+          throw new BadRequestException('Could not be negative total')
+        }
+        sale.saleItems = totalProducts;
+        sale.saleDiscount=discount;
+        const saleProduct = await this.saleRepository.createSale(sale);
         
-        if (!product || product.productStock<1) {
-          throw new BadRequestException(`Product not found: ${product}`)
-        }
-        let discountProduct:number=product.productDiscount/100 * product.productPrice;
-         
-         
-        totalSale = totalSale + (parseFloat(String(product.productPrice))-discountProduct) * products[index].items;         
-
-        //Si hay producto suficiente se realiza el decremento
-        if (product.productStock >= products[index].items ) {
-          await queryRunner.manager.decrement(Product,{ productId: product.productId },'productStock',products[index].items,);
-          totalProducts += products[index].items;
-          listProducts.push(product);
-        } else {
-        //Si no hay productos suficientes en stock para cubrir la peticion se lanza un error
-          throw new BadRequestException(`Product ${product.productCode} is not enough in stock`);
-        }
-      }
-      
-      //Se crea una venta
-      const discount_percentage=createSaleDto.discount_percentage;
-      let discount=0;
-      let discount_currency=createSaleDto.discount_currency;
-      if (!discount_currency)discount_currency=0;
-
-      if (!discount_percentage){
-        discount = this.discountCurrency.calculateDiscount(totalSale,discount_currency);
-      }else{
-        discount=this.discountPercentage.calculateDiscount(totalSale,discount_percentage);
-      }
-      sale.saleTotal=totalSale-discount;
-      sale.saleItems = totalProducts;
-      sale.saleDiscount=discount;
-      const saleProduct = await this.saleRepository.createSale(sale);
-      
-      //Se registra la venta en la tabla pivote
-      listProducts.forEach(async (product, index) => {
-        const sale_product = {
-          sales: saleProduct,
-          products: product,
-          totalProducts: products[index].items,
-        };
+        //Se registra la venta en la tabla pivote
+        listProducts.forEach(async (product, index) => {
+          const sale_product = {
+            sales: saleProduct,
+            products: product,
+            totalProducts: products[index].items,
+          };
+          await queryRunner.manager.save(Sale_Products, sale_product);
+        });
         
-        await queryRunner.manager.save(Sale_Products, sale_product);
-      });
-      
-      //Se ejecuta la transacción
-      await queryRunner.commitTransaction();
-      await queryRunner.release();
-      
-      return this.res.response('OK', 'Sale was created.', 'Success', new Date());
+        //Se ejecuta la transacción
+        await queryRunner.commitTransaction();
+        await queryRunner.release();
+        
+        return this.res.response('OK', 'Sale was created.', 'Success', new Date());
     
-    } catch (error) {      
-      await queryRunner.rollbackTransaction();
-      await queryRunner.release();
-      throw new BadRequestException('Sale could not be created') 
-    }
+      } catch (error) {      
+        await queryRunner.rollbackTransaction();
+        await queryRunner.release();
+        throw new BadRequestException('Sale could not be created') 
+      }
     
   }
 
@@ -118,26 +126,28 @@ export class SalesService {
 
   async findOne(saleId: string) {
     try {
-    const sale = await this.saleRepository.findOneSale(saleId,'sale_products')    
-    const saleProducts=sale.sale_products
-    const saleProductsIds:any[]=[]
-    saleProducts.forEach((saleProduct)=>{
-      const saleProductId={
-        sale_productId:saleProduct.sale_productsId
+      const sale = await this.saleRepository.findOneSale(saleId,'sale_products')    
+      const saleProducts=sale.sale_products
+      const saleProductsIds:any[]=[]
+      saleProducts.forEach((saleProduct)=>{
+        const saleProductId={
+          sale_productId:saleProduct.sale_productsId
+        }
+        saleProductsIds.push(saleProductId)
+      })
+
+      let sale_products:Sale_Products[]=[]
+      
+      for (let index = 0; index < saleProductsIds.length; index++) {
+        const saleProduct= await this.saleProductRepository.findOneSaleProducts(saleProductsIds[index].sale_productId,'products')
+        sale_products.push(saleProduct)
       }
-      saleProductsIds.push(saleProductId)
-    })
-    let sale_products:Sale_Products[]=[]
-    for (let index = 0; index < saleProductsIds.length; index++) {
-      const saleProduct= await this.saleProductRepository.findOneSaleProducts(saleProductsIds[index].sale_productId,'products')
-      sale_products.push(saleProduct)
-    }
-    const saleN = await this.saleRepository.findById(sale_products,sale)
-    return this.res.response('OK', 'Found sale.', saleN, new Date());
+      
+      const saleN = await this.saleRepository.findById(sale_products,sale)
+      return this.res.response('OK', 'Found sale.', saleN, new Date());
     } catch (error) {
       throw new NotFoundException('Sale not found')
     }
-    
-}
+  }
 
 }

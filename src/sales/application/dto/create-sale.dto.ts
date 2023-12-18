@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsNumber, IsOptional, IsPositive, MAX, Max, Min } from "class-validator";
+import { IsArray, IsNumber, IsOptional, Max, Min } from "class-validator";
 import { Product } from "src/products/infraestructure/entities/product.entity";
 
 export class CreateSaleDto {

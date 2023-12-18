@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductsModule } from './products/products.module';
-// import { HousesModule } from './houses/houses.module';
 import { SalesModule } from './sales/sales.module';
 import { DiscountModule } from './discount/discount.module';
 
