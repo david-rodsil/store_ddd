@@ -48,7 +48,7 @@ export class SalesService {
         const product = await this.productRepository.findOneByCode(products[index].productCode)
         
         if (!product || product.productStock<1) {
-          throw new BadRequestException(`Product nof found: ${product}`)
+          throw new BadRequestException(`Product not found: ${product}`)
         }
         let discountProduct:number=product.productDiscount/100 * product.productPrice;
          
@@ -109,7 +109,7 @@ export class SalesService {
 
   async findAll():Promise<CustomResponseInterface>{
     const sales=await this.saleRepository.findAll()
-    return this.res.response('OK', 'Sales found.', sales, new Date());
+    return this.res.response('OK', 'Found sales.', sales, new Date());
   }
 
   async findOne(saleId: string) {
@@ -129,7 +129,7 @@ export class SalesService {
       sale_products.push(saleProduct)
     }
     const saleN = await this.saleRepository.findById(sale_products,sale)
-    return saleN
+    return this.res.response('OK', 'Found sale.', saleN, new Date());
     } catch (error) {
       throw new NotFoundException('Sale not found')
     }

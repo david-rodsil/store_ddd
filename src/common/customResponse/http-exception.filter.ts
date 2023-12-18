@@ -13,12 +13,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
       exception instanceof HttpException ? exception.getResponse() : exception;
    
         response.status(200).json({
-          code: status,
+          status: status,
           success: false,
           entity: null,
           message: msg,
           timestamp: new Date().toISOString(),
-          path: request.url,
         });
     
   }
