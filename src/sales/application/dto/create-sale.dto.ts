@@ -6,4 +6,8 @@ export class CreateSaleDto {
     @ApiProperty({description:'Array of products',nullable:false})
     @IsArray()
     readonly products: Product[]
+    
+    @ApiProperty({description:'Array of discounts',nullable:false})
+    @IsArray()
+    readonly discounts: any[]
 }

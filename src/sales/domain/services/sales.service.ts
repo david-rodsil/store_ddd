@@ -31,6 +31,9 @@ export class SalesService {
       await queryRunner.startTransaction();
       
       try {
+      console.log(createSaleDto)
+      console.log(createSaleDto);
+      
       const products = createSaleDto.products;
       const sale = new Sale();
       let totalSale: number = 0;
