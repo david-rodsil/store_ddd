@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray } from "class-validator";
+import { IsArray, IsNumber, IsOptional, IsPositive, MAX, Max, Min } from "class-validator";
 import { Product } from "src/products/infraestructure/entities/product.entity";
 
 export class CreateSaleDto {
@@ -7,7 +7,16 @@ export class CreateSaleDto {
     @IsArray()
     readonly products: Product[]
     
-    @ApiProperty({description:'Array of discounts',nullable:false})
-    @IsArray()
-    readonly discounts: any[]
+    @ApiProperty({description:'Percentage discount'})
+    @IsNumber()
+    @IsOptional()
+    @Min(1)
+    @Max(100)
+    readonly discount_percentage?:number;
+
+    @ApiProperty({description:'Currency discount',default:0})
+    @IsNumber()
+    @IsOptional()
+    @Min(1)
+    readonly discount_currency?:number;
 }

@@ -6,6 +6,6 @@ import { DiscountService } from './discount.service';
 export class CurrencyDiscountService implements DiscountService {
 
   calculateDiscount(originalPrice: number,discount:number): number {
-    return originalPrice-discount;
+    return discount;
   }
 }

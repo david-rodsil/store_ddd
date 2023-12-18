@@ -10,6 +10,8 @@ import { Sale } from 'src/sales/infraestructure/entities/sale.entity';
 import { Sale_Products } from 'src/sales/infraestructure/entities/sale_products.entity';
 import { IProductRepository } from 'src/products/domain/irepositories/iproduct.repository';
 import { ISale_ProductsRepository } from '../irepositories/isale_products.repository';
+import { PercentageDiscountService } from 'src/discount/percentage-discount.service';
+import { CurrencyDiscountService } from 'src/discount/currency-discount.service';
 
 @Injectable()
 export class SalesService {
@@ -17,12 +19,16 @@ export class SalesService {
   private readonly res = new CustomResponse();
 
   constructor(
+    
     @InjectRepository(SaleRepository)
     public readonly saleRepository: ISaleRepository,
     @InjectRepository(ProductRepository)
     public readonly productRepository: IProductRepository,
     @InjectRepository(Sale_Products)
-    public readonly saleProductRepository: ISale_ProductsRepository
+    public readonly saleProductRepository: ISale_ProductsRepository,
+
+    public readonly discountCurrency:CurrencyDiscountService,
+    public readonly discountPercentage:PercentageDiscountService
   ) {}
 
   async create(createSaleDto: CreateSaleDto): Promise<CustomResponseInterface> {
@@ -31,15 +37,12 @@ export class SalesService {
       await queryRunner.startTransaction();
       
       try {
-      console.log(createSaleDto)
-      console.log(createSaleDto);
-      
-      const products = createSaleDto.products;
-      const sale = new Sale();
-      let totalSale: number = 0;
-      let totalProducts: number = 0;
-      let listProducts = [];
-  
+        const products = createSaleDto.products;
+        const sale = new Sale();
+        let totalSale: number = 0;
+        let totalProducts: number = 0;
+        let listProducts = [];
+    
       for (let index = 0; index < products.length; index++) {
         
         const product = await this.productRepository.findOneByCode(products[index].productCode)
@@ -64,9 +67,19 @@ export class SalesService {
       }
       
       //Se crea una venta
-      sale.saleTotal = Number(totalSale.toFixed(2));
+      const discount_percentage=createSaleDto.discount_percentage;
+      let discount=0;
+      let discount_currency=createSaleDto.discount_currency;
+      if (!discount_currency)discount_currency=0;
+
+      if (!discount_percentage){
+        discount = this.discountCurrency.calculateDiscount(totalSale,discount_currency);
+      }else{
+        discount=this.discountPercentage.calculateDiscount(totalSale,discount_percentage);
+      }
+      sale.saleTotal=totalSale-discount;
       sale.saleItems = totalProducts;
-      
+      sale.saleDiscount=discount;
       const saleProduct = await this.saleRepository.createSale(sale);
       
       //Se registra la venta en la tabla pivote

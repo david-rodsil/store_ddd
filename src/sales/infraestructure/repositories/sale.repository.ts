@@ -32,7 +32,7 @@ export class SaleRepository extends Repository<Sale> implements ISaleRepository{
           saleTime:sale.saleTime,
           saleTotal:parseFloat(String(sale.saleTotal)),
           saleItems:parseInt(String(sale.saleItems)),
-          saleDiscount:0,
+          saleDiscount:sale.saleDiscount,
           sale_products:[]
           }
       salesDetails.push(detailSale)
@@ -47,7 +47,8 @@ export class SaleRepository extends Repository<Sale> implements ISaleRepository{
       saleId:sale.saleId,
       saleTotal:parseFloat(String(sale.saleTotal)).toFixed(2),
       saleItems:parseInt(String(sale.saleItems)),
-      saleTime:sale.saleTime
+      saleTime:sale.saleTime,
+      saleDisccount:parseFloat(String(sale.saleDiscount)).toFixed(2)
     }
     const saleProductsDetails:any[]=[]
     sale_products.forEach((product)=>{
